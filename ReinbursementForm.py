@@ -1,6 +1,7 @@
 
 import pandas as pd
 import os
+from datetime import datetime
 from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog as fd
@@ -50,18 +51,69 @@ def submit_window():
     open_button = Button(form_window, text='Browse...' , command=lambda:select_file(selected_file, receipt_file)).grid(row=row_counter, column=1)
     row_counter += 1
 
-
-    Button(form_window, text='Submit', command=lambda:submitted(), anchor='w', justify='left').grid(row=row_counter)
+    Button(form_window, text='Submit', command=lambda:submitted(form_window, person_name, amount_CAD, reason, selected_file), anchor='w', justify='left').grid(row=row_counter)
     row_counter += 1
 
-    mainloop() 
+    form_window.mainloop() 
 
-def submitted():
-    #add pandas for excell file input
+def submitted(window, name_submitted, total_money, reason, proof_of_payment):
+    current_time = datetime.now()
+    file_submitted_name = f'{name_submitted.get()}{current_time.month:02d}{current_time.day:02d}{current_time.year}{total_money.get()}'
+    #file_submitted_name = proof_of_payment.cget("text")
+
+    file_name = "Reimbursement Data.xlsx"
+    subdirectory_name = "Cleaned Up Forms"
+    
+    file_path = os.path.join(os.getcwd(), subdirectory_name, file_name)
+    
+    if not os.path.exists(file_path):
+        messagebox.showerror(
+            title="Critical Error",
+            message="expected file path not found, and expected file not found\n please contact software/logistics team lead"
+        )
+        window.destroy()
+        os._exit(1)
+
+    appended_data = {
+        'Name': name_submitted.get(), 
+        'Final Total $CAD': total_money.get(),
+        'Reason(optional)': reason.get(),
+        'Reimbursed (Y/N)': 'N',
+        'Receipt File Name': file_submitted_name
+        }
+    new_data = pd.DataFrame([appended_data], index=[0])
+    excel_file_path = file_path
+
+     # Read the existing data from the Excel file
+    existing_data = pd.read_excel(excel_file_path)
+
+    # Combine the existing data with the new data
+    combined_data = pd.concat([existing_data, new_data], ignore_index=True)
+
+    # Write the combined data back to the Excel file without changing column sizes
+    combined_data.to_excel(excel_file_path, index=False)
+
+    file_submit_path = os.path.join(os.getcwd(), subdirectory_name)
+    file_extension = os.path.splitext(file_submitted_name)[1]
+    file_submit = f'{file_submitted_name}{file_extension}'
+
+    new_file_name = os.path.join(file_submit_path, file_submit)
+    with open(receipt_file, 'r') as input_file:
+        # Read the contents of the input file
+        file_contents = input_file.read()
+
+    # Open the new file for writing
+    with open(file_submit, 'w') as new_file:
+        # Write the contents to the new file
+        new_file.write(file_contents)
+    
+
+
     messagebox.showinfo(title='Submitted', message='You have successfully submitted')
+    return
 
 
-def select_file(tk_window, select_file):
+def select_file(tk_window, selected_file):
     filetypes = (
         ('PDF file', '*.pdf'),
         ('PNG file', '*.png'),
@@ -77,7 +129,7 @@ def select_file(tk_window, select_file):
             title='Selected File',
             message=file_name
         )
-        select_file = file_name
+        receipt_file = file_name
         formatted_file_name = os.path.basename(file_name)
         tk_window["text"] = formatted_file_name
     else:
