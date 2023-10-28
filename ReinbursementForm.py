@@ -8,8 +8,8 @@ from tkinter import filedialog as fd
 
 #https://www.geeksforgeeks.org/python-gui-tkinter/
 
-receipt_file = 0
-
+global receipt_file
+receipt_file = ""
 
 
 def submit_window():
@@ -51,20 +51,20 @@ def submit_window():
     open_button = Button(form_window, text='Browse...' , command=lambda:select_file(selected_file, receipt_file)).grid(row=row_counter, column=1)
     row_counter += 1
 
-    Button(form_window, text='Submit', command=lambda:submitted(form_window, person_name, amount_CAD, reason, selected_file), anchor='w', justify='left').grid(row=row_counter)
+    Button(form_window, text='Submit', command=lambda:submitted(form_window, person_name, amount_CAD, reason), anchor='w', justify='left').grid(row=row_counter)
     row_counter += 1
 
     form_window.mainloop() 
 
-def submitted(window, name_submitted, total_money, reason, proof_of_payment):
+def submitted(window, name_submitted, total_money, reason):
+    global receipt_file
     current_time = datetime.now()
     file_submitted_name = f'{name_submitted.get()}{current_time.month:02d}{current_time.day:02d}{current_time.year}{total_money.get()}'
-    #file_submitted_name = proof_of_payment.cget("text")
 
-    file_name = "Reimbursement Data.xlsx"
+    excel_file = "Reimbursement Data.xlsx"
     subdirectory_name = "Cleaned Up Forms"
     
-    file_path = os.path.join(os.getcwd(), subdirectory_name, file_name)
+    file_path = os.path.join(os.getcwd(), subdirectory_name, excel_file)
     
     if not os.path.exists(file_path):
         messagebox.showerror(
@@ -74,12 +74,14 @@ def submitted(window, name_submitted, total_money, reason, proof_of_payment):
         window.destroy()
         os._exit(1)
 
+    file_extension = os.path.splitext(file_submitted_name)[1]
+    file_submit = f'{file_submitted_name}{file_extension}'
     appended_data = {
         'Name': name_submitted.get(), 
         'Final Total $CAD': total_money.get(),
         'Reason(optional)': reason.get(),
         'Reimbursed (Y/N)': 'N',
-        'Receipt File Name': file_submitted_name
+        'Receipt File Name': file_submit
         }
     new_data = pd.DataFrame([appended_data], index=[0])
     excel_file_path = file_path
@@ -95,20 +97,24 @@ def submitted(window, name_submitted, total_money, reason, proof_of_payment):
 
     file_submit_path = os.path.join(os.getcwd(), subdirectory_name)
     file_extension = os.path.splitext(file_submitted_name)[1]
-    file_submit = f'{file_submitted_name}{file_extension}'
+    file_submit_path = os.path.join(file_submit_path, file_submit)
 
     new_file_name = os.path.join(file_submit_path, file_submit)
-    with open(receipt_file, 'r') as input_file:
-        # Read the contents of the input file
-        file_contents = input_file.read()
+    if os.path.exists(receipt_file):
+        # with open(receipt_file, 'r') as input_file:
+        with open(receipt_file, 'rb') as input_file:
+            # Continue with file operations
+            # Read the contents of the input file
+            file_contents = input_file.read()
 
-    # Open the new file for writing
-    with open(file_submit, 'w') as new_file:
-        # Write the contents to the new file
-        new_file.write(file_contents)
-    
+            # Open the new file for writing
+        with open(file_submit_path, 'wb') as new_file:
+            # Write the contents to the new file
+            new_file.write(file_contents)
 
-
+    else:
+            messagebox.showinfo(title="error", message=f"File '{receipt_file}' does not exist.")
+        
     messagebox.showinfo(title='Submitted', message='You have successfully submitted')
     return
 
@@ -120,17 +126,16 @@ def select_file(tk_window, selected_file):
         ('JPEG file', '*.jpeg'),
         ('JPG file', '*.jpg')
     )
-
-    file_name = fd.askopenfilename(
+    global receipt_file
+    receipt_file = fd.askopenfilename(
         title='Open a file',
         filetypes=filetypes)
-    if(file_name != None):
+    if(receipt_file != None):
         messagebox.showinfo(
             title='Selected File',
-            message=file_name
+            message=receipt_file
         )
-        receipt_file = file_name
-        formatted_file_name = os.path.basename(file_name)
+        formatted_file_name = os.path.basename(receipt_file)
         tk_window["text"] = formatted_file_name
     else:
         messagebox.showinfo(
