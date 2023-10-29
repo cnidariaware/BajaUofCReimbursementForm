@@ -6,41 +6,43 @@ from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog as fd
 
-#https://www.geeksforgeeks.org/python-gui-tkinter/
-
+#holds the location of the file selected when user selects it
 global receipt_file
 receipt_file = ""
 
-
+#the window that pops up when trying to submit the
 def submit_window():
-    form_window = Tk()
-    form_window.title("Reinbursement Form") 
-    row_counter = 0
+    form_window = Tk()                          #the window itself
+    form_window.title("Reinbursement Form")     #title at the top of the window
+    row_counter = 0                             #tkinter uses a grid system with columns and rows
 
-    new_form = Menu(form_window)
-    new_form.add_command(label='New')
+    """
+    new_form = Menu(form_window)                #need to be fixed or removed
+    new_form.add_command(label='New')           #add commands to remove all tet and deselect files
+    """
 
     Label(form_window, text="This standardizes all of our reciepts that we recieve and logs \nthem away so that we can easily get the money you \nspent on the club back to you.", anchor='w', justify='left').grid(row=row_counter, rowspan=2, columnspan=2)
-    row_counter += 2
+    row_counter += 2    #takes up two row for text to be visable general instructions
     
     Label(form_window, text="Please put the amount on the reciept we will split the bill on \nfood for you no need to go through mental gymnatics", anchor='w', justify='left').grid(row=row_counter, rowspan=2, columnspan=2)
-    row_counter += 2
+    row_counter += 2    #takes up 2 twos for text mroe genral instructions
 
     Label(form_window, text=" ").grid(row=row_counter, columnspan=2)
-    row_counter += 1
+    row_counter += 1    #fake text for space
 
+    #Text for input
     Label(form_window, text='Name (Last name if there is \nsomeone who shares your name)', anchor='w', justify='left').grid(row=row_counter)
-    person_name = Entry(form_window)
+    person_name = Entry(form_window)    #the text box for entires
     person_name.grid(row=row_counter, column=1)
-    row_counter += 1
+    row_counter += 1    
 
     Label(form_window, text='Final Total on reciept $(CAD)', anchor='w', justify='left').grid(row=row_counter)
-    amount_CAD = Entry(form_window)
-    amount_CAD.grid(row=row_counter, column=1)
+    amount_CAD = Entry(form_window)     #the entry box window for all strings
+    amount_CAD.grid(row=row_counter, column=1)  #need to filter for just doubles
     row_counter += 1
 
     Label(form_window, text='Reason (optional)', justify='left').grid(row=row_counter)
-    reason = Entry(form_window)
+    reason = Entry(form_window)         #the entry box window for all strings
     reason.grid(row=row_counter, column=1)
     row_counter += 1
     
@@ -49,13 +51,14 @@ def submit_window():
     selected_file.grid(row=row_counter, column=1)
     row_counter += 1
     open_button = Button(form_window, text='Browse...' , command=lambda:select_file(selected_file, receipt_file)).grid(row=row_counter, column=1)
-    row_counter += 1
+    row_counter += 1    #button for opening window to pick a file
 
     Button(form_window, text='Submit', command=lambda:submitted(form_window, person_name, amount_CAD, reason), anchor='w', justify='left').grid(row=row_counter)
     row_counter += 1
 
     form_window.mainloop() 
 
+#function that appends the data to the .xlsx file and makes a copy of the document and places it into the clean up forms so it may be given as evidence
 def submitted(window, name_submitted, total_money, reason):
     global receipt_file
     current_time = datetime.now()
