@@ -1,7 +1,3 @@
-# BajaUofCReimbursementForm
-Author Brock Tomlinson
-Email brock.tomlinson@ucalgary.ca
-
 To run the reinburment form please run this command to install the only package needed
 
 pip install pandas==1.3.3

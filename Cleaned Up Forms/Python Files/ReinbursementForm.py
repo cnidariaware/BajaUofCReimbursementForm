@@ -1,19 +1,9 @@
 
-import sys
 import os
 from datetime import datetime
 from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog as fd
-script_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Get the path of your package directory
-package_dir = os.path.join(script_dir, "package")
-
-# Add the package directory to the beginning of sys.path
-sys.path.insert(0, package_dir)
-
-# Import the local 'pandas' module
 import pandas as pd
 
 #holds the location of the file selected when user selects it
