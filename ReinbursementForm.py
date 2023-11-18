@@ -1,19 +1,12 @@
-
+"""
+Please read the howToRun.txt file before attempting to run
+"""
 import sys
 import os
 from datetime import datetime
 from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog as fd
-script_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Get the path of your package directory
-package_dir = os.path.join(script_dir, "package")
-
-# Add the package directory to the beginning of sys.path
-sys.path.insert(0, package_dir)
-
-# Import the local 'pandas' module
 import pandas as pd
 
 #holds the location of the file selected when user selects it
@@ -77,18 +70,19 @@ def submitted(window, name_submitted, total_money, reason):
     excel_file = "Reimbursement Data.xlsx"
     subdirectory_name = "Cleaned Up Forms"
     
-    file_path = os.path.join(os.getcwd(), subdirectory_name, excel_file)
-    
+    file_path = os.path.join(os.getcwd(), subdirectory_name, r"Reimbursement Data.xlsx")
+
     if not os.path.exists(file_path):
         messagebox.showerror(
             title="Critical Error",
-            message="expected file path not found, and expected file not found\n please contact software/logistics team lead"
+            message=f'expected file path not found, and expected file not found\n please contact software/logistics team lead\nError: 77\n{file_path}'
         )
         window.destroy()
         os._exit(1)
 
-    file_extension = os.path.splitext(file_submitted_name)[1]
-    file_submit = f'{file_submitted_name}{file_extension}'
+    file_extension = os.path.splitext(receipt_file)[1]
+    file_submit = f'{file_submitted_name}{file_extension}' if file_extension else file_submitted_name
+
     appended_data = {
         'Name': name_submitted.get(), 
         'Final Total $CAD': total_money.get(),
@@ -107,11 +101,8 @@ def submitted(window, name_submitted, total_money, reason):
 
     # Write the combined data back to the Excel file without changing column sizes
     combined_data.to_excel(excel_file_path, index=False)
-
-    file_submit_path = os.path.join(os.getcwd(), subdirectory_name)
-    file_extension = os.path.splitext(file_submitted_name)[1]
-    file_submit_path = os.path.join(file_submit_path, file_submit)
-
+    file_submit = f'{file_submitted_name}{file_extension}'
+    file_submit_path = os.path.join(os.getcwd(), subdirectory_name, file_submit)
     new_file_name = os.path.join(file_submit_path, file_submit)
     if os.path.exists(receipt_file):
         # with open(receipt_file, 'r') as input_file:
@@ -127,13 +118,13 @@ def submitted(window, name_submitted, total_money, reason):
 
     else:
             messagebox.showinfo(title="error", message=f"File '{receipt_file}' does not exist.")
-        
     messagebox.showinfo(title='Submitted', message='You have successfully submitted')
     return
 
 
 def select_file(tk_window, selected_file):
     filetypes = (
+    	('All files', '*.*'),
         ('PDF file', '*.pdf'),
         ('PNG file', '*.png'),
         ('JPEG file', '*.jpeg'),
@@ -159,3 +150,4 @@ def select_file(tk_window, selected_file):
 
 if __name__ == "__main__":
     submit_window()
+
