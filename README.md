@@ -10,3 +10,10 @@ Other Requirement
 Python 3.10.2 or higher can be found at
 https://www.python.org/downloads/
 please select the version for your computer
+
+
+# REDO COMPLETELY
+
+ONLY USE IDEAS FROM THIS
+
+NEW Standards can be found in W - Software
